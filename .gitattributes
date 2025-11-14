@@ -1,0 +1,63 @@
+* text=auto eol=lf
+
+*.sh text eol=lf
+*.bat text eol=crlf
+*.js  text eol=lf
+*.jsx text eol=lf
+*.ts  text eol=lf
+*.tsx text eol=lf
+*.py  text eol=lf
+*.java text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md  text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.xml text eol=lf
+*.sql text eol=lf
+*.graphql text eol=lf
+*.proto text eol=lf
+Dockerfile text eol=lf
+*.env text eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.mp4 binary
+*.mov binary
+*.wav binary
+*.mp3 binary
+*.bin binary
+*.model binary
+*.ckpt binary
+*.pt binary
+*.pkl binary
+
+*.lock merge=union
+package-lock.json merge=union
+yarn.lock merge=union
+pnpm-lock.yaml merge=union
+poetry.lock merge=union
+requirements.txt merge=union
+values.yaml merge=union
+
+*.json diff=json
+*.yml diff=yaml
+*.yaml diff=yaml
+*.xml diff=xml
+*.md diff=markdown
+*.sql diff=sql
+*.proto diff=proto
+
+* text=auto eol=lf

@@ -1,0 +1,58 @@
+name: CI/CD
+run-name: "[${{ github.ref_name }}] ${{ github.event.repository.name }}:${{ github.sha }}"
+
+on:
+  push:
+    branches: [ main, dev ]
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  CD:
+    runs-on: ubuntu-latest
+    needs: CI
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: himedia-no1/prizm-gitops
+          ref: ${{ github.ref_name }}
+          token: ${{ secrets.GITOPS_TOKEN }}
+          path: gitops
+
+      - name: Update and Push to GitOps Repository
+        run: |
+          cd gitops
+          sed -i "s|\([[:space:]]*${{ github.event.repository.name }}-tag:\s*\).*|\1${{ github.sha }}|g" charts/prizm/values.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add charts/prizm/values.yaml
+          git commit -m "[${{ github.ref_name }}] ${{ github.event.repository.name }}:${{ github.sha }}"
+          git push origin ${{ github.ref_name }}
