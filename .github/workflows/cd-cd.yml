@@ -50,9 +50,9 @@ jobs:
       - name: Update and Push to GitOps Repository
         run: |
           cd gitops
-          sed -i "s|\([[:space:]]*${{ github.event.repository.name }}-tag:\s*\).*|\1${{ github.sha }}|g" charts/prizm/values.yaml
+          sed -i "s/^\([[:space:]]*prizmServiceAiImageTag:[[:space:]]*\).*/\1${{ github.sha }}/" charts/prizm/values.yaml
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add charts/prizm/values.yaml
-          git commit -m "[${{ github.ref_name }}] ${{ github.event.repository.name }}:${{ github.sha }}"
+          git commit -m "${{ github.sha }}"
           git push origin ${{ github.ref_name }}
