@@ -13,7 +13,8 @@ from qdrant_client.models import (
     PointStruct,
     Filter,
     FieldCondition,
-    MatchValue
+    MatchValue,
+    FilterSelector
 )
 
 logger = logging.getLogger(__name__)
@@ -24,19 +25,16 @@ class QdrantService:
         # Qdrant API 키가 있으면 인증, 없으면 인증 없이
         qdrant_api_key = os.getenv("QDRANT_API_KEY")
 
+        host = os.getenv("QDRANT_HOST", "localhost")
+        port = os.getenv("QDRANT_PORT", 6333)
+        url = f"http://{host}:{port}"
+
         if qdrant_api_key:
             logger.info("Connecting to Qdrant with API key authentication")
-            self.client = QdrantClient(
-                host=os.getenv("QDRANT_HOST"),
-                port=int(os.getenv("QDRANT_PORT")),
-                api_key=qdrant_api_key
-            )
+            self.client = QdrantClient(url=url, api_key=qdrant_api_key)
         else:
             logger.info("Connecting to Qdrant without authentication")
-            self.client = QdrantClient(
-                host=os.getenv("QDRANT_HOST"),
-                port=int(os.getenv("QDRANT_PORT")),
-            )
+            self.client = QdrantClient(url=url)
 
         self.collection_name = "prizm_rag"
         self.vector_size = 1536  # OpenAI text-embedding-3-small
@@ -138,7 +136,7 @@ class QdrantService:
         # 삭제
         self.client.delete(
             collection_name=self.collection_name,
-            points_selector=count_filter
+            points_selector=FilterSelector(filter=count_filter)
         )
 
         logger.info(f"Deleted vectors for workspace={workspace_id}, file={file_id}")
